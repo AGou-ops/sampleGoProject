@@ -28,6 +28,9 @@ var (
 		}]}`
 )
 
+// 注意： 客户端需要在环境变量中设置相关变量才能开启grpc重试
+// export GRPC_GO_RETRY=on
+// 但是后来发现好像不用设置该变量也是可以的.
 func main() {
 	flag.Parse()
 	conn, err := grpc.Dial(*addr, grpc.WithInsecure(), grpc.WithDefaultServiceConfig(retryPolicy))
