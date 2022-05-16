@@ -1,9 +1,6 @@
-#!/usr/bin/env bash
+#!/bin/sh
 echo 'Runing migrations...'
-/myapp/migrate up > /dev/null 2>&1 &
-
-echo 'Deleting mysql-client...'
-apk del mysql-client
+/myapp/bin/migrate up > /dev/null 2>&1 &
 
 echo 'Start application...'
-/myapp/app
+/myapp/bin/app
