@@ -6,11 +6,10 @@ package logger_test
 import (
 	"errors"
 	"flag"
+	"myapp/util/logger"
 	"time"
 
 	"github.com/rs/zerolog"
-
-	"myapp/util/logger"
 )
 
 // setup would normally be an init() function, however, there seems
