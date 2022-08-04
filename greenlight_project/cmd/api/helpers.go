@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -19,12 +20,11 @@ func (app *application) readIDParam(r *http.Request) (int64, error) {
 	return id, nil
 }
 
-func (app *application) formatJson(w http.ResponseWriter, status int, data interface{}, headers http.Header) error {
+func (app *application) formatJson(w http.ResponseWriter, r http.Request, status int, data interface{}, headers http.Header) error {
 	json, err := json.Marshal(data)
 	if err != nil {
 		return err
 	}
-	json = append(json, '\n')
 
 	for k,v := range headers {
 		w.Header()[k] = v
@@ -32,7 +32,13 @@ func (app *application) formatJson(w http.ResponseWriter, status int, data inter
 
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(status)
-	w.Write(json)
+
+	ifUAdata, err := writeJson(&r, data)
+	fmt.Fprintf(w, ifUAdata)
+
+	if err != nil {
+		w.Write(json)
+	}
 
 	return nil
 }

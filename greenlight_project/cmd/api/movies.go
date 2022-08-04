@@ -25,11 +25,11 @@ func (app *application) showMovieHandler(w http.ResponseWriter, r *http.Request)
 		CreatedAt: time.Now(),
 		Title:     "Let's Go Further!",
 		Year:      2020,
-		Runtime:   0,
+		Runtime:   99,
 		Type:      []string{"Go", "GOlang", "web"},
 		Version:   0,
 	}
-	if err := app.formatJson(w, http.StatusOK, movie, nil); err != nil {
+	if err := app.formatJson(w,*r, http.StatusOK, movie, nil); err != nil {
 		app.logger.Println(err.Error())
 		http.Error(w, "format json error", http.StatusInternalServerError)
 	}

@@ -14,7 +14,7 @@ func (app *application) healthcheckHandler(w http.ResponseWriter, r *http.Reques
 		"version": version,
 		"afterMarshal": "somethinghere",
 	}
-	if err := app.formatJson(w, http.StatusOK, data, nil); err != nil {
+	if err := app.formatJson(w,*r, http.StatusOK, data, nil); err != nil {
 		app.logger.Println(err)
 		http.Error(w, "formatJson internal error", http.StatusInternalServerError)
 		return
