@@ -5,17 +5,28 @@ import (
 	"net/http"
 	"time"
 
-	"greenlight.agou-ops.cn/data"
+	"greenlight.agou-ops.cn/internal/data"
 )
 
 func (app *application) createMovieHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "created a movie")
+	var userInput struct {
+		Title   string       `json:"title"`
+		Year    int          `json:"year"`
+		Runtime data.Runtime `json:"runtime"`
+		Genres  []string     `json:"genres"`
+	}
+	err := app.readJSON(w, r, &userInput)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+	fmt.Fprintf(w, "%+v\n", userInput)
 }
 
 func (app *application) showMovieHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := app.readIDParam(r)
 	if err != nil {
-		http.NotFound(w,r)
+		http.NotFound(w, r)
 		w.Write([]byte(err.Error()))
 		return
 	}
@@ -29,9 +40,8 @@ func (app *application) showMovieHandler(w http.ResponseWriter, r *http.Request)
 		Type:      []string{"Go", "GOlang", "web"},
 		Version:   0,
 	}
-	if err := app.formatJson(w,*r, http.StatusOK, movie, nil); err != nil {
-		app.logger.Println(err.Error())
-		http.Error(w, "format json error", http.StatusInternalServerError)
+	if err := app.writeJson(w, *r, http.StatusOK, envelope{"movie": movie}, nil); err != nil {
+		app.serverErrResponse(w, r, err)
 	}
 	w.Header().Set("content-type", "application/json")
 }
