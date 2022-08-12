@@ -9,11 +9,11 @@ import (
 
 // > User-Agent: curl/7.80.0
 
-func writeJson(req *http.Request, data interface{}) (string, error)  {
+func writeJsonByUA(req *http.Request, data interface{}) (string, error) {
 	client_ua := req.UserAgent()
 	result, err := json.MarshalIndent(data, "", "\t")
 	if err != nil {
-		return "",errors.New("indent failed")
+		return "", errors.New("indent failed")
 	}
 	isCurlUA, _ := regexp.MatchString("curl.*", client_ua)
 

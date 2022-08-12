@@ -58,13 +58,13 @@ func (app *application) readJSON(w http.ResponseWriter, r *http.Request, dst int
 		case errors.As(err, &invalidUnmarshalError):
 			panic(err)
 		default:
-			return nil
+			return err
 		}
 	}
 
 	err = dec.Decode(&struct{}{})
-	if err != nil {
-		return errors.New("Request body must only contain single JSON value")
+	if err != io.EOF {
+		return errors.New("body must only contain a single JSON value")
 	}
 
 	return nil
@@ -83,12 +83,11 @@ func (app *application) writeJson(w http.ResponseWriter, r http.Request, status 
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(status)
 
-	ifUAdata, err := writeJson(&r, data)
+	ifUAdata, err := writeJsonByUA(&r, data)
 	fmt.Fprintf(w, ifUAdata)
 
 	if err != nil {
 		w.Write(json)
 	}
-
 	return nil
 }

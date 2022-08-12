@@ -15,6 +15,7 @@ func (app *application) errorResponse(w http.ResponseWriter, r *http.Request, st
 	if err != nil {
 		app.logError(r, err)
 		w.WriteHeader(500)
+
 	}
 }
 
@@ -34,6 +35,10 @@ func (app *application) methodNotAllowedResponse(w http.ResponseWriter, r *http.
 	app.errorResponse(w, r, http.StatusMethodNotAllowed, message)
 }
 
-func (app application) badRequestResponse(w http.ResponseWriter, r *http.Request, err error) {
+func (app *application) badRequestResponse(w http.ResponseWriter, r *http.Request, err error) {
 	app.errorResponse(w, r, http.StatusBadRequest, err.Error())
+}
+
+func (app *application) failedValidationResponse(w http.ResponseWriter, r *http.Request, errors map[string]string) {
+	app.errorResponse(w, r, http.StatusUnprocessableEntity, errors)
 }

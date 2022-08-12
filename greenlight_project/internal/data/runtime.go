@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-var ErrInvalidRuntimePath = errors.New("invalid runtime path")
+var ErrInvalidRuntimePath = errors.New("invalid runtime format")
 
 type Runtime int32
 
