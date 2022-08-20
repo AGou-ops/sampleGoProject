@@ -6,10 +6,12 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 
 	"github.com/julienschmidt/httprouter"
+	"greenlight.agou-ops.cn/internal/validator"
 )
 
 type envelope map[string]interface{}
@@ -90,4 +92,34 @@ func (app *application) writeJson(w http.ResponseWriter, r http.Request, status 
 		w.Write(json)
 	}
 	return nil
+}
+
+func (app *application) readString(qs url.Values, key string, defaultValue string) string {
+	str := qs.Get(key)
+
+	if str == "" {
+		return defaultValue
+	}
+	return str
+}
+
+func (app *application) readCSV(qs url.Values, key string, defaultValue []string) []string {
+	csv := qs.Get(key)
+	if csv == "" {
+		return defaultValue
+	}
+	return strings.Split(csv, ",")
+}
+
+func (app *application) readInt(qs url.Values, key string, defaultValue int, v *validator.Validator) int {
+	str := qs.Get(key)
+	if str == "" {
+		return defaultValue
+	}
+	i, err := strconv.Atoi(str)
+	if err != nil {
+		v.AddError(key, "must be a number")
+		return defaultValue
+	}
+	return i
 }
