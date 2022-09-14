@@ -48,12 +48,12 @@ func (m Mailer) Send(recipient, templateFile string, data interface{}) error {
 		return err
 	}
 
-	plainBody := new(bytes.Buffer)
-	err = tmpl.ExecuteTemplate(plainBody, "plainBody", data)
-	if err != nil {
-		return err
-	}
-
+	// plainBody := new(bytes.Buffer)
+	// err = tmpl.ExecuteTemplate(plainBody, "plainBody", data)
+	// if err != nil {
+	// 	return err
+	// }
+	//
 	htmlBody := new(bytes.Buffer)
 	err = tmpl.ExecuteTemplate(htmlBody, "htmlBody", data)
 	if err != nil {
@@ -62,8 +62,8 @@ func (m Mailer) Send(recipient, templateFile string, data interface{}) error {
 
 	to := []string{recipient}
 	from := m.sender
-	msg := strings.NewReader(fmt.Sprintf("To: %s\r\nSubject: %s\r\nContent-Type: text/html; charset=UTF-8\r\n%s\r\n%s\r\n",
-		to, subject.String(), plainBody.String(), htmlBody.String()))
+	msg := strings.NewReader(fmt.Sprintf("To: %s\r\nSubject: %s\r\nContent-Type: text/html; charset=UTF-8\r\n%s\r\n",
+		to, subject.String(), htmlBody.String()))
 
 	for i := 1; i <= 3; i++ {
 		err = smtp.SendMail(m.dialer.server, m.dialer.auth, from, to, msg)

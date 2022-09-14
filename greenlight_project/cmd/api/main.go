@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"flag"
 	"os"
+	"sync"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -43,6 +44,7 @@ type application struct {
 	logger *jsonlog.Logger
 	models data.Models
 	dialer mailer.Mailer
+	wg     sync.WaitGroup
 }
 
 func openDB(cfg config) (*sql.DB, error) {

@@ -74,6 +74,7 @@ func (app *application) readJSON(w http.ResponseWriter, r *http.Request, dst int
 
 func (app *application) writeJson(w http.ResponseWriter, r http.Request, status int, data interface{}, headers http.Header) error {
 	json, err := json.Marshal(data)
+	fmt.Println(string(json))
 	if err != nil {
 		return err
 	}
@@ -122,4 +123,17 @@ func (app *application) readInt(qs url.Values, key string, defaultValue int, v *
 		return defaultValue
 	}
 	return i
+}
+
+func (app *application) background(fn func()) {
+	app.wg.Add(1)
+	go func() {
+		defer app.wg.Done()
+		defer func() {
+			if err := recover(); err != nil {
+				app.logger.PrintError(fmt.Errorf("%s", err), nil)
+			}
+			fn()
+		}()
+	}()
 }

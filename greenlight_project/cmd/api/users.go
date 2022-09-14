@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 
 	"greenlight.agou-ops.cn/internal/data"
@@ -19,7 +18,6 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 		app.badRequestResponse(w, r, err)
 		return
 	}
-	fmt.Printf("%+v", input)
 
 	user := &data.User{
 		Name:      input.Name,
@@ -52,18 +50,12 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	go func() {
-		defer func() {
-			if err := recover(); err != nil {
-				app.logger.PrintError(fmt.Errorf("%s", err), nil)
-			}
-		}()
-
+	app.background(func() {
 		err = app.dialer.Send(user.Email, "../../internal/mailer/templates/user_welcome.tmpl", user)
 		if err != nil {
 			app.serverErrResponse(w, r, err)
 		}
-	}()
+	})
 
 	if err = app.writeJson(w, *r, http.StatusCreated, envelope{"User": user}, nil); err != nil {
 		app.serverErrResponse(w, r, err)
