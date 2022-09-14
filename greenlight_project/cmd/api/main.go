@@ -4,16 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"flag"
-	"fmt"
-	"log"
-	"net/http"
 	"os"
-	"os/signal"
 	"time"
 
 	_ "github.com/lib/pq"
 	"greenlight.agou-ops.cn/internal/data"
 	"greenlight.agou-ops.cn/internal/jsonlog"
+	"greenlight.agou-ops.cn/internal/mailer"
 )
 
 const version = "1.0.0"
@@ -27,12 +24,25 @@ type config struct {
 		maxIdleConns int
 		maxIdleTime  string
 	}
+	limiter struct {
+		rps     float64
+		burst   int
+		enabled bool
+	}
+	smtp struct {
+		host     string
+		port     int
+		username string
+		password string
+		sender   string
+	}
 }
 
 type application struct {
 	config config
 	logger *jsonlog.Logger
 	models data.Models
+	dialer mailer.Mailer
 }
 
 func openDB(cfg config) (*sql.DB, error) {
@@ -71,6 +81,18 @@ func main() {
 	flag.IntVar(&cfg.db.maxIdleConns, "max-idle-conns", 25, "PostgreSQL max idle connections")
 	flag.StringVar(&cfg.db.maxIdleTime, "max-idle-time", "15m", "Postgress max idle time")
 
+	flag.Float64Var(&cfg.limiter.rps, "limiter-rps", 2, "Rate limter maximum of requests per second")
+	flag.IntVar(&cfg.limiter.burst, "limiter-burst", 4, "Rate limter maximum burst")
+	flag.BoolVar(&cfg.limiter.enabled, "limiter-enabled", true, "Enable rate limter")
+
+	// 	SendSmtp("smtp.163.com:25", da"i15628960878@163.com", "TGMXZWNPZOJPCLCL", []string{"ictw@qq.com"}, "hello", "world")
+
+	flag.StringVar(&cfg.smtp.host, "smtp-host", "smtp.163.com", "smtp server hostname")
+	flag.IntVar(&cfg.smtp.port, "smtp-port", 25, "smtp server port")
+	flag.StringVar(&cfg.smtp.username, "smtp-username", "dai15628960878@163.com", "smtp server email username")
+	flag.StringVar(&cfg.smtp.password, "smtp-password", "TGMXZWNPZOJPCLCL", "smtp server password")
+	flag.StringVar(&cfg.smtp.sender, "smtp-sender", "dai15628960878@163.com", "smtp sender email address")
+
 	flag.Parse()
 
 	// logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
@@ -88,40 +110,10 @@ func main() {
 		config: cfg,
 		logger: logger,
 		models: data.NewModel(db),
+		dialer: mailer.New(cfg.smtp.host, cfg.smtp.port, cfg.smtp.username, cfg.smtp.password, cfg.smtp.sender),
 	}
-
-	srv := &http.Server{
-		Addr:              fmt.Sprintf(":%d", cfg.port),
-		Handler:           app.routes(),
-		ReadTimeout:       10 * time.Second,
-		ReadHeaderTimeout: 30 * time.Second,
-		IdleTimeout:       time.Minute,
+	err = app.serve()
+	if err != nil {
+		logger.PrintFatal(err, nil)
 	}
-
-	// start the server
-	go func() {
-		// logger.Printf("starting %s server on :%d ", cfg.env, cfg.port)
-		logger.PrintInfo("starting server", map[string]string{
-			"addr": srv.Addr,
-			"env":  cfg.env,
-		})
-
-		if err := srv.ListenAndServe(); err != nil {
-			logger.PrintFatal(err, nil)
-		}
-	}()
-
-	// trap sigterm or interupt and gracefully shutdown the server
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
-	signal.Notify(c, os.Kill)
-
-	// Block until a signal is received.
-	sig := <-c
-	log.Println("Got signal:", sig)
-
-	// gracefully shutdown the server, waiting max 30 seconds for current operations to complete
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-	srv.Shutdown(ctx)
 }

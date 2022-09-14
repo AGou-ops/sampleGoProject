@@ -28,6 +28,11 @@ func (app *application) serverErrResponse(w http.ResponseWriter, r *http.Request
 	app.errorResponse(w, r, http.StatusInternalServerError, message)
 }
 
+func (app *application) rateLimitExceededResponse(w http.ResponseWriter, r *http.Request) {
+	message := "rate limit exceeded"
+	app.errorResponse(w, r, http.StatusTooManyRequests, message)
+}
+
 func (app *application) notFoundResponse(w http.ResponseWriter, r *http.Request) {
 	message := "the content you want could not be found."
 	app.errorResponse(w, r, http.StatusNotFound, message)
