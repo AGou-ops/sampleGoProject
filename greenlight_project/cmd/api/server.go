@@ -29,7 +29,7 @@ func (app *application) serve() error {
 
 		// Block until a signal is received.
 		sig := <-quit
-		app.logger.PrintInfo("shuttding down", map[string]string{
+		app.logger.PrintInfo("shutting down", map[string]string{
 			"signal": sig.String(),
 		})
 		// gracefully shutdown the server, waiting max 30 seconds for current operations to complete
