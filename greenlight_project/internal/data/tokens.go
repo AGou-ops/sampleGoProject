@@ -11,14 +11,17 @@ import (
 	"greenlight.agou-ops.cn/internal/validator"
 )
 
-const ScopeActivation = "activation"
+const (
+	ScopeActivation     = "activation"
+	ScopeAuthentication = "authentication"
+)
 
 type Token struct {
-	PlainText string
-	Hash      []byte
-	UserID    int64
-	Expire    time.Time
-	Scope     string
+	PlainText string    `json:"token"`
+	Hash      []byte    `json:"-"`
+	UserID    int64     `json:"-"`
+	Expire    time.Time `json:"expire"`
+	Scope     string    `json:"-"`
 }
 
 func generateToken(userID int64, ttl time.Duration, scope string) (*Token, error) {
