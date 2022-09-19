@@ -12,4 +12,5 @@ require (
 require (
 	github.com/emersion/go-sasl v0.0.0-20200509203442-7bfe0ed36a21 // indirect
 	github.com/emersion/go-smtp v0.15.0 // indirect
+	github.com/felixge/httpsnoop v1.0.3 // indirect
 )
