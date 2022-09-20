@@ -87,7 +87,7 @@ func (app *application) writeJson(w http.ResponseWriter, r http.Request, status 
 	w.WriteHeader(status)
 
 	ifUAdata, err := writeJsonByUA(&r, data)
-	fmt.Fprintf(w, ifUAdata)
+	fmt.Fprint(w, ifUAdata)
 
 	if err != nil {
 		w.Write(json)

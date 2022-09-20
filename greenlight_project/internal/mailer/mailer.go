@@ -2,7 +2,6 @@ package mailer
 
 import (
 	"bytes"
-	"embed"
 	"fmt"
 	"html/template"
 	"strings"
@@ -12,7 +11,7 @@ import (
 	"github.com/emersion/go-smtp"
 )
 
-var templateFS embed.FS
+// var templateFS embed.FS
 
 type Dialer struct {
 	auth   sasl.Client

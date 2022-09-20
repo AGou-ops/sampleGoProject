@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"expvar"
 	"flag"
+	"fmt"
 	"os"
 	"runtime"
 	"strings"
@@ -17,7 +18,10 @@ import (
 	"greenlight.agou-ops.cn/internal/mailer"
 )
 
-const version = "1.0.0"
+var (
+	buildTime string
+	version   string
+)
 
 type config struct {
 	port int
@@ -106,7 +110,15 @@ func main() {
 		return nil
 	})
 
+	displayVersion := flag.Bool("version", false, "display current version")
+
 	flag.Parse()
+
+	if *displayVersion {
+		fmt.Println(version)
+		fmt.Println(buildTime)
+		os.Exit(0)
+	}
 
 	// logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
 	logger := jsonlog.New(os.Stdout, jsonlog.LevelInfo)
