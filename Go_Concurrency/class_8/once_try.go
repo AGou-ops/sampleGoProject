@@ -64,8 +64,7 @@ func main() {
 	}
 
 	if conn != nil {
-		_, _ = conn.Write([]byte("GET / HTTP/1.1\r\nHost: google.com\r\n Accept: */*\r\n\r\n"))
+		_, _ = conn.Write([]byte("GET / HTTP/1.1\r\nHost: baidu.com\r\n Accept: */*\r\n\r\n"))
 		_, _ = io.Copy(os.Stdout, conn)
 	}
-
 }

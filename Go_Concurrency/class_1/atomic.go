@@ -19,6 +19,5 @@ func main() {
 		}()
 	}
 	wg.Wait()
-	fmt.Println("count的值:",count)
-
+	fmt.Println("count的值:", count)
 }

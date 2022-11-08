@@ -1,4 +1,3 @@
-
 package main
 
 import (
@@ -17,6 +16,7 @@ func main() {
 	}
 	for j := 0; j < num; j++ {
 		go worker(j, chs[j], chs[(j+1)%num])
+		// 0 1 / 1 2 / 2 3 / 3 0
 	}
 	// 先把令牌交给第一个
 	chs[0] <- struct{}{}

@@ -27,6 +27,6 @@ func main() {
 
 func job2(index int) {
 	// 耗时任务
-	time.Sleep(1*time.Second)
+	time.Sleep(1 * time.Second)
 	fmt.Printf("任务:%d已完成\n", index)
 }

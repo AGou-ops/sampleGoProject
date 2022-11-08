@@ -32,7 +32,7 @@ type RecursiveMutex struct {
 
 func (m *RecursiveMutex) Lock() {
 	gid := goid.Get()
-//	gid:=GoID()
+	//	gid:=GoID()
 	if atomic.LoadInt64(&m.owner) == gid {
 		m.recursion++
 		return
@@ -41,8 +41,6 @@ func (m *RecursiveMutex) Lock() {
 	atomic.StoreInt64(&m.owner, gid)
 	m.recursion = 1
 }
-
-
 
 func (m *RecursiveMutex) Unlock() {
 	gid := goid.Get()

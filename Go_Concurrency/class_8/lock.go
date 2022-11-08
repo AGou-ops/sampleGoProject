@@ -6,8 +6,10 @@ import (
 	"time"
 )
 
-var conMu sync.Mutex
-var conn net.Conn
+var (
+	conMu sync.Mutex
+	conn  net.Conn
+)
 
 func getConn() net.Conn {
 	conMu.Lock()

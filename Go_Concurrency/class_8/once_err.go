@@ -25,9 +25,9 @@ func ErrTwo() {
 	var googleConn net.Conn
 
 	once.Do(func() {
-		googleConn, _ = net.Dial("tcp", "google.com:80")
+		googleConn, _ = net.Dial("tcp", "baidu.com:80")
 	})
-	_, _ = googleConn.Write([]byte("GET / HTTP/1.1\r\nHost: google.com\r\n Accept: */*\r\n\r\n"))
+	_, _ = googleConn.Write([]byte("GET / HTTP/1.1\r\nHost: baidu.com\r\n Accept: */*\r\n\r\n"))
 	_, _ = io.Copy(os.Stdout, googleConn)
 }
 

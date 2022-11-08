@@ -31,7 +31,7 @@ func (q *SliceQueue) Dequeue() interface{} {
 	// 如果队列为空，直接返回nil
 	if len(q.data) == 0 {
 		q.mu.Unlock()
-		return "队列没有数据了"
+		return 0
 	}
 	v := q.data[0]
 	// 移除队头
@@ -54,6 +54,9 @@ func main() {
 		for {
 			v := queue.Dequeue()
 			fmt.Println("出队的值是：", v)
+			if v == 0 {
+				fmt.Println("队列没有数据了")
+			}
 			time.Sleep(50 * time.Millisecond)
 		}
 	}()

@@ -9,7 +9,6 @@ import (
 )
 
 func main() {
-
 	c := sync.NewCond(&sync.Mutex{})
 
 	var ready int

@@ -10,7 +10,7 @@ import (
 func main() {
 	var wg sync.WaitGroup
 	var mu sync.Mutex
-	var count = 0
+	count := 0
 
 	// wg.Add(10)
 	for i := 0; i < 10; i++ {
