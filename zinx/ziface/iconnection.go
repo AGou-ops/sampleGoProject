@@ -21,6 +21,6 @@ type IConnection interface {
 	// 发送数据
 	Send(data []byte) error
 }
-
-// 处理连接业务的方法
-type HandleFunc func(*net.TCPConn, []byte, int) error
+//
+// // 处理连接业务的方法
+// type HandleFunc func(*net.TCPConn, []byte, int) error
