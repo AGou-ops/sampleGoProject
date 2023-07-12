@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 
+	"github.com/AGou-ops/zinx/utils"
 	"github.com/AGou-ops/zinx/ziface"
 )
 
@@ -20,9 +21,13 @@ type Server struct {
 // 启动服务器
 func (s *Server) Start() {
 	log.Printf("Server started at: %s:%d \n", s.IP, s.Port)
+	log.Printf("%+v", utils.GlobalObject)
 	go func() {
 		// 获取一个TCP的Address
-		addr, err := net.ResolveTCPAddr(s.IPVersion, fmt.Sprintf("%s:%d", s.IP, s.Port))
+		addr, err := net.ResolveTCPAddr(
+			s.IPVersion,
+			fmt.Sprintf("%s:%d", s.IP, s.Port),
+		)
 		if err != nil {
 			log.Println(err)
 			return
@@ -87,12 +92,12 @@ func (s *Server) AddRouter(router ziface.IRouter) {
 	log.Println("AddRouter successfully")
 }
 
-func NewServer(name string) ziface.IServer {
+func NewServer() ziface.IServer {
 	s := &Server{
-		Name:      name,
+		Name:      utils.GlobalObject.Name,
 		IPVersion: "tcp4",
-		IP:        "0.0.0.0",
-		Port:      9097,
+		IP:        utils.GlobalObject.Host,
+		Port:      utils.GlobalObject.TcpPort,
 		Router:    nil,
 	}
 	return s

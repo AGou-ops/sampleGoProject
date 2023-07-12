@@ -4,6 +4,7 @@ import (
 	"log"
 	"net"
 
+	"github.com/AGou-ops/zinx/utils"
 	"github.com/AGou-ops/zinx/ziface"
 )
 
@@ -25,7 +26,11 @@ type Connection struct {
 }
 
 // 初始化连接模块的方法
-func NewConnection(conn *net.TCPConn, ConnID uint32, router ziface.IRouter) *Connection {
+func NewConnection(
+	conn *net.TCPConn,
+	ConnID uint32,
+	router ziface.IRouter,
+) *Connection {
 	return &Connection{
 		Conn:     conn,
 		ConnID:   ConnID,
@@ -41,7 +46,7 @@ func (c *Connection) StartReader() {
 	defer c.Stop()
 
 	for {
-		buf := make([]byte, 512)
+		buf := make([]byte, utils.GlobalObject.MaxConn)
 		_, err := c.Conn.Read(buf)
 		if err != nil {
 			log.Println("Recv buf error: ", err)
@@ -82,7 +87,6 @@ func (c *Connection) Stop() {
 		return
 	}
 	c.isClosed = true
-
 }
 
 // 获取当前连接绑定的socket conn
