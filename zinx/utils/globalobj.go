@@ -15,7 +15,7 @@ type globalObj struct {
 	Name          string
 	Version       string
 	MaxConn       int
-	MaxPacketSize int
+	MaxPacketSize uint32
 }
 
 var GlobalObject *globalObj
@@ -38,7 +38,7 @@ func init() {
 		Name:          "Zinx server app",
 		Version:       "v0.4",
 		MaxConn:       999999,
-		MaxPacketSize: 512,
+		MaxPacketSize: 4096,
 	}
-	GlobalObject.Reload()
+	// GlobalObject.Reload()
 }
