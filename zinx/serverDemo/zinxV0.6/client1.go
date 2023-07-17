@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	log.Println("client started")
+	log.Println("client1 started")
 	time.Sleep(time.Second)
 	conn, err := net.Dial("tcp", "127.0.0.1:8999")
 	if err != nil {
@@ -21,7 +21,7 @@ func main() {
 	for {
 		dp := znet.NewDataPack()
 		binaryMsg, err := dp.Pack(
-			znet.NewMsgPackage(0, []byte("zinx0.5 test msg")),
+			znet.NewMsgPackage(1, []byte("zinx0.6 client1 test msg")),
 		)
 		if err != nil {
 			log.Println("Pack msg error: ", err)
