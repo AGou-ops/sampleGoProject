@@ -11,6 +11,9 @@ import (
 )
 
 type Connection struct {
+	// 当前conn隶属于哪个server
+	TcpServer ziface.IServer
+
 	// 当前连接的socket TCP套接字
 	Conn *net.TCPConn
 
@@ -33,11 +36,13 @@ type Connection struct {
 
 // 初始化连接模块的方法
 func NewConnection(
+	server ziface.IServer,
 	conn *net.TCPConn,
 	ConnID uint32,
 	msgHander ziface.IMsgHandler,
 ) *Connection {
-	return &Connection{
+	c := &Connection{
+		TcpServer: server,
 		Conn:      conn,
 		ConnID:    ConnID,
 		isClosed:  false,
@@ -45,6 +50,9 @@ func NewConnection(
 		msgChan:   make(chan []byte),
 		MsgHander: msgHander,
 	}
+	c.TcpServer.GetConnMgr().Add(c)
+
+	return c
 }
 
 func (c *Connection) StartReader() {
@@ -143,6 +151,8 @@ func (c *Connection) Stop() {
 	}
 	c.isClosed = true
 	c.ExitChan <- true
+	// 将当前连接从connMgr中删除掉
+	c.TcpServer.GetConnMgr().Remove(c)
 	// 回收资源
 	close(c.ExitChan)
 	close(c.msgChan)

@@ -17,6 +17,7 @@ type Server struct {
 	Port      int
 	// Router    ziface.IRouter
 	MsgHandler ziface.IMsgHandler
+	ConnMgr    ziface.IConnManager
 }
 
 // 启动服务器
@@ -53,23 +54,17 @@ func (s *Server) Start() {
 				continue
 			}
 
-			// go func() {
-			// 	for {
-			// 		buf := make([]byte, 512)
-			// 		cnt, err := conn.Read(buf)
-			// 		if err != nil {
-			// 			log.Println(err)
-			// 			continue
-			// 		}
-			// 		fmt.Println("recv client buf: ", string(buf), cnt)
-			// 		if _, err := conn.Write(buf[:cnt]); err != nil {
-			// 			log.Println("Write Back error: ", err)
-			// 			continue
-			// 		}
-			//
-			// 	}
-			// }()
-			dealConn := NewConnection(conn, cid, s.MsgHandler)
+			// 如果超过最大链接的数量，那么则关闭新的连接
+			if s.ConnMgr.Len() >= utils.GlobalObject.MaxConn {
+				log.Println(
+					"TOO Many Connections. max connection: ",
+					utils.GlobalObject.MaxConn,
+				)
+				conn.Close()
+				continue
+			}
+
+			dealConn := NewConnection(s, conn, cid, s.MsgHandler)
 			cid++
 			go dealConn.Start()
 		}
@@ -78,7 +73,8 @@ func (s *Server) Start() {
 
 // 停止服务器
 func (s *Server) Stop() {
-	// TODO: 停止服务
+	log.Println("zinx server name: ", s.Name, "CLOSED!")
+	s.ConnMgr.ClearConn()
 }
 
 // 运行服务器
@@ -95,6 +91,11 @@ func (s *Server) AddRouter(msgID uint32, router ziface.IRouter) {
 	log.Println("AddRouter successfully")
 }
 
+// 获取当前server的连接管理器
+func (s *Server) GetConnMgr() ziface.IConnManager {
+	return s.ConnMgr
+}
+
 func NewServer() ziface.IServer {
 	s := &Server{
 		Name:       utils.GlobalObject.Name,
@@ -102,6 +103,7 @@ func NewServer() ziface.IServer {
 		IP:         utils.GlobalObject.Host,
 		Port:       utils.GlobalObject.TcpPort,
 		MsgHandler: NewMsgHandle(),
+		ConnMgr:    NewConnManager(),
 	}
 	return s
 }
