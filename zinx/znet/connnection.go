@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 
+	"github.com/AGou-ops/zinx/utils"
 	"github.com/AGou-ops/zinx/ziface"
 )
 
@@ -94,13 +95,13 @@ func (c *Connection) StartReader() {
 			conn: c,
 			msg:  msg,
 		}
-		// 从路由中，找到注册绑定的Conn对应的router调用
-		// go func(request ziface.IRequest) {
-		// c.Router.PreHandle(request)
-		// c.Router.Handle(request)
-		// c.Router.PostHandle(request)
-		// }(&req)
-		go c.MsgHander.DoMsgHandler(&req)
+
+		if utils.GlobalObject.WorkerPoolSize > 0 {
+			c.MsgHander.SendMsgToTaskQueue(&req)
+		} else {
+			// 从路由中，找到注册绑定的Conn对应的router调用
+			go c.MsgHander.DoMsgHandler(&req)
+		}
 
 	}
 }

@@ -9,6 +9,10 @@ import (
 
 const headerSize = 4 // 头部长度的字节数
 
+type Cat struct {
+	test string
+}
+
 func main() {
 	// 启动服务器
 	go startServer()

@@ -24,6 +24,8 @@ func (s *Server) Start() {
 	log.Printf("Server started at: %s:%d \n", s.IP, s.Port)
 	log.Printf("%+v", utils.GlobalObject)
 	go func() {
+		// 开启工作池
+		s.MsgHandler.StartWorkerPool()
 		// 获取一个TCP的Address
 		addr, err := net.ResolveTCPAddr(
 			s.IPVersion,
