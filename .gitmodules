@@ -1,3 +1,12 @@
 [submodule "lux"]
 	path = lux
 	url = https://github.com/iawia002/lux.git
+[submodule "hex-microservice"]
+	path = hex-microservice
+	url = https://github.com/tensor-programming/hex-microservice.git
+[submodule "chatgpt-web"]
+	path = chatgpt-web
+	url = https://github.com/869413421/chatgpt-web.git
+[submodule "gin-vue-admin"]
+	path = gin-vue-admin
+	url = https://github.com/flipped-aurora/gin-vue-admin.git
