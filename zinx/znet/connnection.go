@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"sync"
 
 	"github.com/AGou-ops/zinx/utils"
 	"github.com/AGou-ops/zinx/ziface"
@@ -32,6 +33,11 @@ type Connection struct {
 	// 当前连接的处理router
 	// Router ziface.IRouter
 	MsgHander ziface.IMsgHandler
+
+	// 链接属性集合
+	properties map[string]interface{}
+	// 保护链属性的锁
+	propertyLock sync.RWMutex
 }
 
 // 初始化连接模块的方法
@@ -42,13 +48,15 @@ func NewConnection(
 	msgHander ziface.IMsgHandler,
 ) *Connection {
 	c := &Connection{
-		TcpServer: server,
-		Conn:      conn,
-		ConnID:    ConnID,
-		isClosed:  false,
-		ExitChan:  make(chan bool, 1),
-		msgChan:   make(chan []byte),
-		MsgHander: msgHander,
+		TcpServer:    server,
+		Conn:         conn,
+		ConnID:       ConnID,
+		isClosed:     false,
+		ExitChan:     make(chan bool, 1),
+		msgChan:      make(chan []byte),
+		MsgHander:    msgHander,
+		properties:   map[string]interface{}{},
+		propertyLock: sync.RWMutex{},
 	}
 	c.TcpServer.GetConnMgr().Add(c)
 
@@ -198,4 +206,28 @@ func (c *Connection) SendMsg(msgId uint32, data []byte) error {
 	// }
 	c.msgChan <- binaryMsg
 	return nil
+}
+
+// 设置连接属性
+func (c *Connection) SetProperty(key string, value interface{}) {
+	c.propertyLock.Lock()
+	defer c.propertyLock.Unlock()
+	c.properties[key] = value
+}
+
+// 获取连接属性
+func (c *Connection) GetProperty(key string) (interface{}, error) {
+	c.propertyLock.RLock()
+	defer c.propertyLock.RUnlock()
+	if value, ok := c.properties[key]; ok {
+		return value, nil
+	}
+	return nil, errors.New("no property found")
+}
+
+// 移除连接属性
+func (c *Connection) RemoveProperty(key string) {
+	c.propertyLock.Lock()
+	defer c.propertyLock.Unlock()
+	delete(c.properties, key)
 }
