@@ -55,8 +55,24 @@ func (pr *HelloRouter) Handle(request ziface.IRequest) {
 	}
 }
 
+func DoConnBegin(conn ziface.IConnection) {
+	log.Println("After Connection Start hook...")
+	if err := conn.SendMsg(301, []byte("Connection Begin.")); err != nil {
+		log.Println(err)
+	}
+}
+
+func DoConnOver(conn ziface.IConnection) {
+	log.Println("Before Connection Close hook...")
+	log.Println("ConnID: ", conn.GetConnID(), " is lost...")
+}
+
 func main() {
 	s := znet.NewServer()
+
+	s.SetOnConnStart(DoConnBegin)
+	s.SetOnConnStop(DoConnOver)
+
 	s.AddRouter(0, &PingRouter{})
 	s.AddRouter(1, &HelloRouter{})
 	s.Server()

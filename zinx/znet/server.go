@@ -18,6 +18,9 @@ type Server struct {
 	// Router    ziface.IRouter
 	MsgHandler ziface.IMsgHandler
 	ConnMgr    ziface.IConnManager
+
+	OnConnStart func(conn ziface.IConnection)
+	OnConnStop  func(conn ziface.IConnection)
 }
 
 // 启动服务器
@@ -94,6 +97,28 @@ func (s *Server) AddRouter(msgID uint32, router ziface.IRouter) {
 // 获取当前server的连接管理器
 func (s *Server) GetConnMgr() ziface.IConnManager {
 	return s.ConnMgr
+}
+
+func (s *Server) SetOnConnStart(hookFunc func(connection ziface.IConnection)) {
+	s.OnConnStart = hookFunc
+}
+
+func (s *Server) SetOnConnStop(hookFunc func(connection ziface.IConnection)) {
+	s.OnConnStop = hookFunc
+}
+
+func (s *Server) CallOnConnStart(connection ziface.IConnection) {
+	if s.OnConnStart != nil {
+		log.Println("Call OnConnStart()...")
+		s.OnConnStart(connection)
+	}
+}
+
+func (s *Server) CallOnConnStop(connection ziface.IConnection) {
+	if s.OnConnStop != nil {
+		log.Println("Call OnConnStop()...")
+		s.OnConnStop(connection)
+	}
 }
 
 func NewServer() ziface.IServer {

@@ -139,7 +139,8 @@ func (c *Connection) Start() {
 	// 启动从当前连接读数据的业务
 	go c.StartReader()
 	go c.StartWriter()
-	// TODO: 启动从当前连接写数据的业务
+
+	c.TcpServer.CallOnConnStart(c)
 }
 
 // 停止连接
@@ -150,6 +151,12 @@ func (c *Connection) Stop() {
 		return
 	}
 	c.isClosed = true
+
+	c.TcpServer.CallOnConnStop(c)
+
+	// 关闭socket连接
+	c.Conn.Close()
+
 	c.ExitChan <- true
 	// 将当前连接从connMgr中删除掉
 	c.TcpServer.GetConnMgr().Remove(c)

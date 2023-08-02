@@ -49,7 +49,7 @@ func (mh *MsgHandle) AddRouter(msgID uint32, router ziface.IRouter) {
 
 // 启动一个worker工作池
 func (mh *MsgHandle) StartWorkerPool() {
-	// 根据workerPoolsize开启worker，每一个workder使用一个Goroutine来进行承载
+	// 根据workerPoolsize开启worker，每一个worker使用一个Goroutine来进行承载
 	for i := 0; i < int(mh.WorkerPoolSize); i++ {
 		// 启动一个workder
 		// 第0个worker就用第0个channel
@@ -80,7 +80,14 @@ func (mh *MsgHandle) startOneWorker(
 func (mh *MsgHandle) SendMsgToTaskQueue(request ziface.IRequest) {
 	// 将消息平均分配给不同的worker
 	workerID := request.GetConnection().GetConnID() % mh.WorkerPoolSize
-	log.Println("Add ConnID: ", request.GetConnection().GetConnID(), "request MsgID: ", request.GetMsgID(), "to workerID: ", workerID)
+	log.Println(
+		"Add ConnID: ",
+		request.GetConnection().GetConnID(),
+		"request MsgID: ",
+		request.GetMsgID(),
+		"to workerID: ",
+		workerID,
+	)
 
 	// 将消息发送给对应的worker的TaskQueue即可
 	mh.TaskQueue[workerID] <- request
