@@ -10,3 +10,6 @@
 [submodule "gin-vue-admin"]
 	path = gin-vue-admin
 	url = https://github.com/flipped-aurora/gin-vue-admin.git
+[submodule "zinx"]
+	path = zinx
+	url = https://github.com/aceld/zinx.git
